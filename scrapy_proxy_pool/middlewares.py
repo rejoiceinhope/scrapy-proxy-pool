@@ -79,7 +79,7 @@ class ProxyPoolMiddleware(object):
 
         filters = dict()
         filters['anonymous'] = s.getbool('PROXY_POOL_FILTER_ANONYMOUS', False)
-        filters['types'] = s.get('PROXY_POOL_FILTER_TYPES', ['http', 'https'])
+        filters['type'] = s.get('PROXY_POOL_FILTER_TYPES', ['http', 'https'])
         filters['code'] = s.get('PROXY_POOL_FILTER_CODE', 'us')
 
         mw = cls(
