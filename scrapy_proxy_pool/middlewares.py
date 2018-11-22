@@ -66,6 +66,7 @@ class ProxyPoolMiddleware(object):
         self.collector = create_collector('proxy-pool', ['http', 'https'], refresh_interval)
         self.collector.apply_filter(filters)
 
+        self.refresh_interval = refresh_interval
         self.logstats_interval = logstats_interval
         self.stop_if_no_proxies = stop_if_no_proxies
         self.max_proxies_to_try = max_proxies_to_try
@@ -98,7 +99,7 @@ class ProxyPoolMiddleware(object):
     def engine_started(self):
         self.log_task = task.LoopingCall(self.log_stats)
         self.log_task.start(self.logstats_interval, now=True)
-        self.refresh_proxies_task = task.LoopingCall(self.refresh_proxies)
+        self.refresh_proxies_task = task.LoopingCall(self.refresh_blacklist)
         self.refresh_proxies_task.start(self.refresh_interval, now=False)
 
     def engine_stopped(self):
@@ -116,7 +117,8 @@ class ProxyPoolMiddleware(object):
                 raise CloseSpider("no_proxies")
             else:
                 logger.warn("No proxies available; reload proxies.")
-                self.refresh_proxies(True)
+                self.collector.refresh_proxies(True)
+                logger.info('Proxies refreshed.')
                 proxy = self.collector.get_proxy()
                 if proxy is None:
                     logger.info("No proxies available even after a reload. Remove proxy usage.")
@@ -133,10 +135,9 @@ class ProxyPoolMiddleware(object):
 
         logger.debug('[ProxyChoosen] {}'.format(request.meta['proxy']))
 
-    def refresh_proxies(self, force=False):
-        self.collector.refresh_proxies(force)
+    def refresh_blacklist(self):
         self.collector.clear_blacklist()
-        logger.info('Proxies refreshed and blacklist is cleared.')
+        logger.info('Blacklist is cleared.')
 
     def get_proxy_slot(self, proxy):
         """
