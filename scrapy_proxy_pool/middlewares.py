@@ -165,6 +165,10 @@ class ProxyPoolMiddleware(object):
         ban = request.meta.get('_ban', None)
         if ban is True:
             self.collector.blacklist_proxy(request.meta.get('proxy_source'))
+            request.meta.pop('proxy_source', None)
+            request.meta.pop('proxy', None)
+            request.meta.pop('download_slot', None)
+            request.meta.pop('_PROXY_POOL', None)
             return self._retry(request, spider)
 
     def _retry(self, request, spider):
