@@ -109,6 +109,8 @@ Settings
 * ``PROXY_POOL_CLOSE_SPIDER`` - When True, spider is stopped if
   there are no alive proxies. If False (default), then when there is no
   alive proxies all dead proxies are re-checked.
+* ``PROXY_POOL_FORCE_REFRESH`` - When True, spider will force refresh proxies if 
+  there are no alive proxies. If False (default), then when there is no alive proxies send request with host ip
 * ``PROXY_POOL_PAGE_RETRY_TIMES`` - a number of times to retry
   downloading a page using a different proxy. After this amount of retries
   failure is considered a page failure, not a proxy failure.
