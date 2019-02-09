@@ -62,7 +62,7 @@ class ProxyPoolMiddleware(object):
       ``PROXY_POOL_PAGE_RETRY_TIMES`` alive proxies. Default: 5.
     """
     def __init__(self, filters, refresh_interval, logstats_interval, stop_if_no_proxies,
-                 max_proxies_to_try, force_refresh_if_no_proxies):
+                 max_proxies_to_try, force_refresh_if_no_proxies, try_with_host):
         self.collector = create_collector('proxy-pool', ['http', 'https'], refresh_interval)
         self.collector.apply_filter(filters)
 
@@ -71,6 +71,7 @@ class ProxyPoolMiddleware(object):
         self.stop_if_no_proxies = stop_if_no_proxies
         self.max_proxies_to_try = max_proxies_to_try
         self.force_refresh_if_no_proxies = force_refresh_if_no_proxies
+        self.try_with_host = try_with_host
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -90,7 +91,8 @@ class ProxyPoolMiddleware(object):
             logstats_interval=s.getfloat('PROXY_POOL_LOGSTATS_INTERVAL', 30),
             stop_if_no_proxies=s.getbool('PROXY_POOL_CLOSE_SPIDER', False),
             max_proxies_to_try=s.getint('PROXY_POOL_PAGE_RETRY_TIMES', 5),
-            force_refresh_if_no_proxies=s.getbool('PROXY_POOL_FORCE_REFRESH', False)
+            force_refresh_if_no_proxies=s.getbool('PROXY_POOL_FORCE_REFRESH', False),
+            try_with_host=s.getbool('PROXY_POOL_TRY_WITH_HOST', True)
         )
         crawler.signals.connect(mw.engine_started,
                                 signal=signals.engine_started)
@@ -190,6 +192,16 @@ class ProxyPoolMiddleware(object):
                          "times with different proxies)",
                          {'request': request, 'retries': retries},
                          extra={'spider': spider})
+
+            if self.try_with_host:
+                logger.debug("Try with host ip")
+                req = request.copy()
+                req.meta.pop('proxy_source', None)
+                req.meta.pop('download_slot', None)
+                req.meta.pop('_PROXY_POOL', None)
+                req.meta['proxy'] = None
+                req.dont_filter = True
+                return req
 
     def log_stats(self):
         pass
