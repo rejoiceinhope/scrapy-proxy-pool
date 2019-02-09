@@ -120,5 +120,6 @@ Settings
   It is possible to change this option per-request using
   ``max_proxies_to_try`` request.meta key - for example, you can use a higher
   value for certain pages if you're sure they should work.
+* ``PROXY_POOL_TRY_WITH_HOST`` - When True, spider will try requests that exceed PROXY_POOL_PAGE_RETRY_TIMES.
 * ``PROXY_POOL_BAN_POLICY`` - path to a ban detection policy.
   Default is ``'scrapy_proxy_pool.policy.BanDetectionPolicy'``.
