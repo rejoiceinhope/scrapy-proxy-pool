@@ -86,7 +86,7 @@ class ProxyPoolMiddleware(object):
 
         mw = cls(
             filters=filters,
-            refresh_interval=s.getfloat('PROXY_POOL_REFRESH_INTERVAL', 900),
+            refresh_interval=s.getfloat('PROXY_POOL_REFRESH_INTERVAL', 600),
             logstats_interval=s.getfloat('PROXY_POOL_LOGSTATS_INTERVAL', 30),
             stop_if_no_proxies=s.getbool('PROXY_POOL_CLOSE_SPIDER', False),
             max_proxies_to_try=s.getint('PROXY_POOL_PAGE_RETRY_TIMES', 5),
@@ -123,14 +123,12 @@ class ProxyPoolMiddleware(object):
                     self.collector.refresh_proxies(True)
                     logger.info('Proxies refreshed.')
 
-                proxy = self.collector.get_proxy()
-                if proxy is None:
-                    logger.info("No proxies available. Remove proxy usage.")
-                    request.meta.pop('proxy_source', None)
-                    request.meta.pop('proxy', None)
-                    request.meta.pop('download_slot', None)
-                    request.meta.pop('_PROXY_POOL', None)
-                    return
+                logger.info("Try to download with host ip.")
+                request.meta.pop('proxy_source', None)
+                request.meta.pop('proxy', None)
+                request.meta.pop('download_slot', None)
+                request.meta.pop('_PROXY_POOL', None)
+                return
 
         request.meta['proxy_source'] = proxy
         request.meta['proxy'] = '{}://{}:{}'.format(proxy.type, proxy.host, proxy.port)
