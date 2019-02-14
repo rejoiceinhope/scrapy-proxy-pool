@@ -124,6 +124,7 @@ class ProxyPoolMiddleware(object):
                 if self.force_refresh_if_no_proxies:
                     self.collector.refresh_proxies(True)
                     logger.info('Proxies refreshed.')
+                    self.refresh_blacklist()
 
                 logger.info("Try to download with host ip.")
                 request.meta.pop('proxy_source', None)
