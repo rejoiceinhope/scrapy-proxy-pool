@@ -25,7 +25,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     install_requires=[
         'scrapy',
-        'proxyscrape23'
+        'proxyscrape'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
