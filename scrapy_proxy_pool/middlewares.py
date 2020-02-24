@@ -113,7 +113,7 @@ class ProxyPoolMiddleware(object):
             self.refresh_proxies_task.stop()
 
     def process_request(self, request, spider):
-        if 'proxy' in request.meta and not request.meta.get('_PROXY_POOL'):
+        if 'proxy' in request.meta and not request.meta.get('_PROXY_POOL', False):
             return
         proxy = self.collector.get_proxy()
         if not proxy:
@@ -160,7 +160,7 @@ class ProxyPoolMiddleware(object):
 
     def _handle_result(self, request, spider):
         proxy = request.meta.get('proxy_source', None)
-        if not (proxy and request.meta.get('_PROXY_POOL')):
+        if not (proxy and request.meta.get('_PROXY_POOL', False)):
             return
 
         ban = request.meta.get('_ban', None)
